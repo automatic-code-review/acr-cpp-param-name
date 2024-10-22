@@ -21,13 +21,16 @@ def review(config):
         objs = get_cpp_methods_json(path)
 
         for obj in objs:
-            if 'pattern' not in obj:
+            kind = obj['kind']
+            name = obj['name']
+
+            if kind == 'property':
                 continue
 
-            if obj['kind'] == 'property':
+            if name == 'Q_DECLARE_METATYPE' or name.startswith("__anon"):
                 continue
 
-            params = extract_parameters_from_signature(obj['pattern'])
+            params = extract_parameters_from_signature(obj['dataLine'])
 
             for param in params:
                 if param.strip() == "":
@@ -61,6 +64,8 @@ def review(config):
                             comment_start_line=line_number,
                             comment_language='c++',
                         ))
+
+    print(json.dumps(comments))
 
     return comments
 
@@ -106,11 +111,16 @@ def get_cpp_methods_json(file_name):
 
     retorno = result.stdout.split("\n")
 
+    with open(file_name, 'r') as content:
+        lines = content.readlines()
+
     objs = []
     for obj in retorno:
         if obj == "":
             continue
 
-        objs.append(json.loads(obj))
+        obj = json.loads(obj)
+        obj['dataLine'] = lines[obj['line'] - 1]
+        objs.append(obj)
 
     return objs
