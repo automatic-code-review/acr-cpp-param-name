@@ -43,6 +43,9 @@ def review(config):
                     param = param[0:param.index('=')].strip()
 
                 parts = param.split(" ")
+                if len(parts) < 2:
+                    continue
+
                 param_name = parts[len(parts) - 1]
 
                 if param_name.endswith("&"):
