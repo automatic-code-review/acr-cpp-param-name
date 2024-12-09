@@ -89,6 +89,9 @@ def extract_parameters_from_signature(signature):
     if "(" not in signature:
         return []
 
+    if "//" in signature:
+        signature = signature[0:signature.index("//")]
+
     part = signature[signature.rindex('(') + 1:]
 
     if ")" not in part:
